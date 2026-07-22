@@ -92,6 +92,8 @@ Open `http://localhost:8080/` and confirm the status page loads and shows the re
 
 > **From the slides:** Notice you changed the region with `-e SHIPIT_REGION="local-dev"` — a *config value passed at run time, not a rebuild*. Same image, different behavior. That is configuration-by-environment, and it is exactly the seam Kubernetes ConfigMaps will plug into in Module 6.
 
+Once you've confirmed both checks, stop the container: go back to the terminal where it's running and press `Ctrl+C`. (It was started without `-d`, so it's running in the foreground and holding port 8080 — the `--rm` flag means it's removed automatically as soon as it stops.) You'll need port 8080 free for Step 3.
+
 ## Step 3: Add Docker Compose for the local loop
 
 In the Explorer panel, hover over the `shipit` root folder, click the **New File** icon, and type `docker-compose.yml`, so a teammate can run ShipIt with one command:
@@ -206,6 +208,7 @@ Read the findings in the run log. Leave `exit-code: "0"` for now so the scan rep
 - **`USER $APP_UID` unknown:** you are on a base image older than .NET 8. Use the `mcr.microsoft.com/dotnet/aspnet:10.0` tag.
 - **Slow builds every time:** you copied all source before restoring. Put the `.csproj` copy and `dotnet restore` before `COPY . .`. (This is the layer-cache rule from Step 1 — a change above the restore layer invalidates it.)
 - **Container exits immediately:** check the `ENTRYPOINT` DLL name matches your published assembly (`ShipIt.dll`).
+- **`docker compose up` fails with a port-in-use / address already allocated error:** the Step 2 container is still running and holding port 8080. Go to that terminal and press `Ctrl+C` to stop it (or run `docker ps` to find it and `docker stop <container-id>`), then retry.
 
 ## Stretch goals
 

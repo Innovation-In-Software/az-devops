@@ -108,7 +108,11 @@ jobs:
 
 Commit and push it: click the **Source Control** icon in the Activity Bar, hover over **Changes** and click the **+** to stage `ci.yml`, type a commit message ("Add CI workflow") in the box at the top, click the checkmark (**Commit**), then click **Publish Branch**.
 
-Open a pull request on GitHub.com: go to your repo, click the **Compare & pull request** button that appears for your just-pushed branch (or the **Pull requests** tab → **New pull request**), confirm the base is `main` and compare is `add-ci`, then click **Create pull request**. Watch the **Checks** tab on the PR: the `build-and-test` job should start, run each step in order, and finish green.
+Open a pull request on GitHub.com: go to your repo, click the **Compare & pull request** button that appears for your just-pushed branch (or the **Pull requests** tab → **New pull request**).
+
+**Check the base repository carefully before creating it.** Because your repo is a fork, GitHub defaults the base to the *original* `jruels/shipit` template, not your own fork — you'll see two dropdowns at the top of the page reading something like `base repository: jruels/shipit` ↔ `head repository: <you>/shipit`. Click the **base repository** dropdown and change it to **your own** `<you>/shipit`, so the comparison reads `base: <you>/shipit:main` ← `compare: <you>/shipit:add-ci` — both sides your own fork, not the upstream. If you skip this, you'll open a PR against the original template repo instead, where you have no merge rights, and you'll hit a review requirement you can't satisfy.
+
+Once both sides point at your own repo, confirm the base branch is `main` and compare branch is `add-ci`, then click **Create pull request**. Watch the **Checks** tab on the PR: the `build-and-test` job should start, run each step in order, and finish green.
 
 > **What you are seeing:** the `on:` block is your trigger, `build-and-test` is the job, `runs-on` is the runner, and each `- name:` is a step. This is the anatomy diagram from the slides, made real.
 
@@ -172,7 +176,7 @@ Commit and push once (via Source Control) to populate the cache (a cache miss, s
 
 A green check does nothing until a red one can stop a merge. On GitHub.com, go to your repo, click the **Settings** tab, then **Branches** in the left sidebar. Under **Branch protection rules**, click **Add branch protection rule** (or **Add rule**). In the **Branch name pattern** field, type `main`, then check:
 
-- **Require a pull request before merging.**
+- **Require a pull request before merging.** Checking this reveals a sub-option, **Require approvals**, switched on with a default of **1** — **uncheck it, or set the number to 0.** You're working solo right now, and GitHub will not let you approve your own pull request, so leaving this on locks you out of merging anything.
 - **Require status checks to pass before merging**, and search for/select the `build-and-test` check (it only appears in this list after the workflow has run at least once — see Troubleshooting below if you don't see it).
 - **Require branches to be up to date before merging.**
 
@@ -217,6 +221,7 @@ You are done when all of these are true:
 - **`--no-build` errors on publish or test:** a previous step must have built the same `--configuration`. All build, test, and publish steps here use `Release`.
 - **Cache never hits:** confirm the `key` is identical between runs and that `*.csproj` files did not change.
 - **Cannot select the status check in branch protection:** the check name only appears after the workflow has run at least once. Run it, then add the rule.
+- **"Review required" / you can't approve your own pull request:** first check the PR itself — GitHub defaults the base repository to the original `jruels/shipit` template when you open a PR from a fork, not your own fork (see the note in Step 2 above). If the PR's base says `jruels/shipit` instead of your own `<you>/shipit`, that's the problem: close this PR (you can't edit its base repository after the fact) and open a new one with **both** sides pointed at your own fork. If the base is correctly your own repo and you still see this, then it's your branch protection rule: go to **Settings → Branches**, edit the rule for `main`, uncheck **Require approvals** (or set it to 0), and save.
 
 ## Stretch goals
 
