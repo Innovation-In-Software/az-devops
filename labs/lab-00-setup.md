@@ -8,34 +8,24 @@
 
 ## Why this lab
 
-The rest of the course is hands-on, and every lab builds on the one before it. This lab does two things at once: it proves your laptop and your accounts work, and it provisions your own Azure environment — a resource group, a container registry, an AKS cluster, and an Entra identity for your pipeline — using your own Azure login, entirely inside your own subscription.
+The rest of the course is hands-on, and every lab builds on the one before it. In this lab you will provision your Azure environment. A resource group, a container registry, an AKS cluster, and an Entra identity for your pipeline.
 
-> **Why it's worth the time.** This is the foundation the whole week stands on. **ShipIt** — the small .NET shipment-tracking service from the slides — is the one app you will carry from a raw commit all the way to a monitored production deployment. Every module adds one link to that chain, and each lab starts exactly where the previous one ended. The two slowest steps in this lab (registering Azure resource providers and creating your AKS cluster) run in the background while you do everything else, so the wait is not wasted time.
-
-> **From the slides — the toolchain is the easy part.** Module 1 makes the case that DevOps is *culture and practices first, tools second*. But the practices still need a working toolchain: source control (GitHub), a pipeline (Actions), containers (Docker), a registry and cluster (ACR/AKS), and identity (Entra + OIDC). This lab is where you prove that toolchain is in your hands before the ideas land on it.
-
-## Concepts this lab makes real
-
-- **The DevOps toolchain** — the concrete tools behind the practices: Git/GitHub, GitHub Actions, Docker, ACR, AKS, Entra ID.
-- **ShipIt, the through-line** — the one .NET service you carry from a raw commit (here) to a monitored production deploy (Lab 7).
-- **Public repo, on purpose** — the free security scanners (Module 4) and the production approval gate (Module 5) only work on a **public** repo for personal accounts.
-- **Repository variables, not secrets** — resource names and the OIDC identity live as `${{ vars.* }}`; with OIDC federation (Module 5) there is no client secret to store.
-- **Least-privilege access you'll rely on** — your pipeline identity is scoped to *your own* resource group only, in *your own* subscription.
+> **Why it's worth the time.** This is the foundation the whole week stands on. **ShipIt** — the small .NET shipment-tracking service from the slides — is the one app you will carry from a raw commit all the way to a monitored production deployment. Every module adds one link to that chain, and each lab starts exactly where the previous one ended.
 
 ## What you will confirm and build
 
 - The local tools are installed at the right versions.
-- Your own fork of the ShipIt starter repository, and you can push to it.
-- Your own resource group, container registry, and AKS cluster in your own Azure subscription.
-- Your own Entra identity for the pipeline, with OIDC trust already wired to your fork.
-- `kubectl` reaches your AKS cluster.
-- A free OpenShift Developer Sandbox for Module 6.
+- A fork of the ShipIt starter repository, and you can push to it.
+- An Azure resource group, container registry, and AKS cluster.
+- Entra identity for the pipeline, with OIDC trust already wired to your fork.
+- `kubectl` connection to AKS cluster.
+- A free OpenShift Developer Sandbox.
 
 ## Prerequisites
 
 - Your own **free personal GitHub account** (create one at github.com if you do not have one).
-- Your own **Azure sign-in** for this class (given to you separately) — a full, dedicated subscription just for you.
-- Your Windows lab VM, with the course tools already installed.
+- An **Azure sign-in** for this class (given to you by instructor)
+- A Windows lab VM, with the course tools already installed.
 
 ---
 
