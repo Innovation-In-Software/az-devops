@@ -36,6 +36,8 @@ The rest of the course is hands-on, and every lab builds on the one before it. I
 3. Make sure it's a **Git Bash** terminal, not PowerShell or Command Prompt: click the dropdown arrow (**⌄**) next to the **+** in the terminal panel's top-right corner and choose **Git Bash** from the list. If you don't see it there, open the Command Palette (`Ctrl+Shift+P`), run **Terminal: Select Default Profile**, choose **Git Bash**, then open a new terminal.
 4. Confirm it's really Bash — the prompt should look like a Unix path (for example `jsmith@LAPTOP MINGW64 ~`), not a `PS C:\>` PowerShell prompt.
 
+Before checking the tools below, start Docker Desktop: double-click the **Docker Desktop** icon on your desktop and wait for it to finish starting (the whale icon in the system tray stops animating once it's ready).
+
 With that terminal open, confirm each tool is installed:
 
 | Tool | Minimum version | Check |
