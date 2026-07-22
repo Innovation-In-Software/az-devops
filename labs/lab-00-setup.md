@@ -57,11 +57,9 @@ gh auth login
 
 `az login` opens a browser — sign in with **your own class Azure account** (not a personal Microsoft account). `gh auth login` — pick **GitHub.com**, **HTTPS**, and authenticate through the browser with **your own personal GitHub account** (create one first at github.com if you don't have one yet).
 
-> **What just happened:** you are now signed in to Azure and GitHub as *yourself*, on your own laptop. Every resource you create for the rest of this course happens under these two identities — nothing is shared with anyone else in the room.
-
 ## Step 2: Fork the ShipIt repository
 
-You use your own personal GitHub account for this course; there is no shared organization.
+You use your own personal GitHub account for this course
 
 **In Visual Studio Code:**
 
