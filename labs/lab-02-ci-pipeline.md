@@ -67,8 +67,8 @@ You should see the solution build and the ShipIt.Tests suite pass. If this fails
 ### Cleanup existing folders and files
 
 * **Delete the exiting `.github` folder.** 
-* **Delete the existing `Dockerfile`.
-* **Delete the existing `docker-compose.yml`.
+* **Delete the existing `Dockerfile`.**
+* **Delete the existing `docker-compose.yml`.**
 
 
 First, create a branch for this change: click the branch name in the blue status bar at the bottom-left of VS Code (it says `main`), choose **Create new branch...**, type `add-ci`, and press **Enter**.
