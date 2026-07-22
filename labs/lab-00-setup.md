@@ -61,7 +61,7 @@ gh auth login
 
 You use your own personal GitHub account for this course
 
-Open `https://github.com/jruels/shipit` in your browser and click **Fork** (top right of the repo page). Set the owner to **your own account**, keep the name **shipit**, and leave visibility **Public**.
+Open [https://github.com/jruels/shipit](https://github.com/jruels/shipit) in your browser and click **Fork** (top right of the repo page). Set the owner to **your own account**, keep the name **shipit**, and leave visibility **Public**.
 
 **In Visual Studio Code:**
 
