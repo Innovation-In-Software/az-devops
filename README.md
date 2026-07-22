@@ -3,6 +3,7 @@
 This site includes the labs for the DevOps: CI/CD class.
 
 ## Labs
+[Azure accounts](https://docs.google.com/spreadsheets/d/1Rc3D7yQz0CwBnhSDJJ8BlrF9ZTXiUnK0_thrSPU-U1k/edit?gid=0#gid=0)
 
 ### Day 1
 Lab 0: [Set Up Your Environment](labs/lab-00-setup.md)  
