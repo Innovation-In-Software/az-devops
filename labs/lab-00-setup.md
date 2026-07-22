@@ -61,19 +61,18 @@ gh auth login
 
 You use your own personal GitHub account for this course
 
+Open `https://github.com/jruels/shipit` in your browser and click **Fork** (top right of the repo page). Set the owner to **your own account**, keep the name **shipit**, and leave visibility **Public**.
+
 **In Visual Studio Code:**
 
-1. Open `https://github.com/jruels/shipit` in your browser and click **Fork** (top right of the repo page). Set the owner to **your own account**, keep the name **shipit**, and leave visibility **Public**.
-2. In VS Code, click the **Source Control** icon in the left Activity Bar (the branching icon — or press `Ctrl+Shift+G`).
-3. Click **Clone Repository**.
-4. Choose **Clone from GitHub**, and sign in if VS Code asks you to.
-5. In the list that appears, pick your fork (`<your-username>/shipit`).
-6. VS Code opens a folder picker so you can choose where to put it on disk. Create a place to keep your class repos: navigate to your **Downloads** folder, click **New Folder**, name it `repos`, then open it and click **Select as Repository Destination**. VS Code clones into `Downloads\repos\shipit`.
-7. When the clone finishes, VS Code shows a notification asking if you want to open the cloned repository — click **Open**.
+1. In VS Code, click the **Source Control** icon in the left Activity Bar (the branching icon — or press `Ctrl+Shift+G`).
+2. Click **Clone Repository**.
+3. Choose **Clone from GitHub**, and sign in if VS Code asks you to.
+4. In the list that appears, pick your fork (`<your-username>/shipit`).
+5. VS Code opens a folder picker so you can choose where to put it on disk. Create a place to keep your class repos: navigate to your **Downloads** folder, click **New Folder**, name it `repos`, then open it and click **Select as Repository Destination**. VS Code clones into `Downloads\repos\shipit`.
+6. When the clone finishes, VS Code shows a notification asking if you want to open the cloned repository — click **Open**.
 
 > **Prefer the terminal?** One command does the fork *and* the clone: `gh repo fork jruels/shipit --clone` (run it from your VS Code Git Bash terminal, in the folder where you want the project to live).
-
-> **Why public?** On a personal (Free) GitHub account, the Day 1 security scanners (Module 4) and the Day 2 production approval gate (Module 5) only work on **public** repositories. Keep your fork public for the whole course.
 
 > **Why a fork, not a copy?** Forking keeps a link back to `jruels/shipit`, so if your instructor ever pushes a fix to it, GitHub can show you the difference and you can pull it in. A plain copy has no such link.
 
