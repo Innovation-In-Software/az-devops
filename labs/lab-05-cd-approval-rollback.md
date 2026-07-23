@@ -235,7 +235,7 @@ Still in `cd.yml`, add two more steps to the end of the `deploy-production` job 
 
 > **What just happened:** the health check is the trigger, not a human noticing. It settles, then insists on *sustained* readiness before declaring success — otherwise it could test the old revision and wave a broken deploy through. On failure the job redeploys the exact previous image by tag, then exits non-zero so the run is clearly marked failed.
 
-First, ship `cd.yml`: save it, then in the **Source Control** panel stage it (**+**), commit ("Add CD pipeline"), and **Publish Branch**. Open a PR into `main` on GitHub.com, wait for the `build-and-test` and `CodeQL` checks to go green, then click **Merge pull request**.
+Finish editing `cd.yml` and save it, then in the **Source Control** panel stage it (**+**), commit ("Add CD pipeline"), and **Publish Branch**. Open a PR into `main` on GitHub.com, wait for the `build-and-test` and `CodeQL` checks to go green, then click **Merge pull request**.
 
 ## Step 6: Prove it, both ways
 
