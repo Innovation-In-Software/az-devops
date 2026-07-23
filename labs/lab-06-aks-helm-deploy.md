@@ -60,11 +60,7 @@ export AKS=shipit-aks
 > - **Azure CLI:** `az acr list -g rg-shipit --query "[].name" -o tsv` prints your registry's name (there's only one in your resource group).
 > - **Azure portal:** go to [portal.azure.com](https://portal.azure.com), open your `rg-shipit` resource group, and find the resource with type **Container registry** in the list — its name is shown right there, and again at the top of its **Overview** page if you click into it.
 
-Then point `kubectl` at your cluster (this pulls the cluster's credentials into your kubeconfig):
-
-```bash
-az aks get-credentials -g "$RG" -n "$AKS"
-```
+`kubectl` is already pointed at your cluster from Lab 0's `az aks get-credentials` — no need to run it again here.
 
 ---
 
