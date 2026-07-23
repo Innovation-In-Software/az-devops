@@ -164,7 +164,7 @@ You have already seen the gate itself hold the line twice: a failing unit test b
 
 Introduce a flagged issue and watch it block the PR. The starter ships an example under `examples/insecure/` (see its `README.md`):
 
-1. Create a new branch (VS Code status bar → **Create new branch...**). In the Explorer, open `examples/insecure/CommandInjectionExample.cs.txt` and copy the **vulnerable** endpoint (the first one in the file). Open `src/ShipIt/Program.cs`, paste it in next to the other `app.MapGet(...)` calls, and save. It reads user input and passes it into a shell command. **Also add `using System.Diagnostics;` at the top of `Program.cs`** (the endpoint uses `Process`), or the build will not compile.
+1. Create a new branch (VS Code status bar → branch name → **Create new branch...** → type `test-codeql-gate`). In the Explorer, open `examples/insecure/CommandInjectionExample.cs.txt` and copy the **vulnerable** endpoint (the first one in the file, marked `VULNERABLE`). Open `src/ShipIt/Program.cs` and paste it in **right before the `app.Run();` line** — after all the other `app.MapGet`/`app.MapPost` calls — then save. It reads user input and passes it into a shell command. **Also add `using System.Diagnostics;` at the top of `Program.cs`**, alongside the existing `using ShipIt.Models;` / `using ShipIt.Services;` lines (the endpoint uses `Process`), or the build will not compile.
 2. Stage, commit, and push (Source Control panel), then open a PR into `main`.
 3. Give CodeQL a couple of minutes. If it flags the issue, the **CodeQL** check goes red and — because it is a required check (Step 4) — the **Merge** button is blocked.
 4. Remediate with the **fixed** version in the same example file, push again, and watch the check clear.
