@@ -202,7 +202,7 @@ Reach the status page (get the external address with `kubectl get service shipit
 >
 > **From the slides:** This realizes the "build-once-configure-per-environment" story at pipeline scale — one image, promoted through the gate, reconciled onto the cluster by the same tool you just ran by hand.
 
-Create a new branch (VS Code status bar → **Create new branch...**), then open `.github/workflows/cd.yml` in the Explorer. In the `deploy-production` job, **replace the entire job body** — every step below `environment: production` — with the steps below. Keep the `environment: production` gate as the job's own line; everything under it is new.
+Create a new branch named `add-helm-deploy` (VS Code status bar → **Create new branch...**), then open `.github/workflows/cd.yml` in the Explorer. In the `deploy-production` job, **replace the entire job body** — every step below `environment: production` — with the steps below. Keep the `environment: production` gate as the job's own line; everything under it is new.
 
 **Why the whole body, not just "Deploy new image":** Lab 5's `deploy-production` job has four moving parts built for Container Apps: a "Record current image" step, the deploy itself, a hand-written `curl` health-check loop, and a rollback step — and the last three all call `az containerapp show`/`az containerapp update`, which have nothing to do with the AKS cluster you're deploying to now. None of that logic transfers. AKS gets a cleaner design instead, because Helm already does most of the work:
 
@@ -292,7 +292,7 @@ kubectl scale deployment/shipit --replicas=5
 kubectl get pods -w          # watch new pods gate on readiness before serving
 ```
 
-Make a small code change on a new branch, PR it into `main`, merge, then approve production and watch the rolling update proceed: new pods only take traffic once `/readyz` passes.
+Make a small code change on a new branch named `test-rolling-update`: in `src/ShipIt/Program.cs`, find `static string AppVersion() => Environment.GetEnvironmentVariable("SHIPIT_VERSION") ?? "0.1.0-dev";` and change the fallback string to `"0.1.1-dev"`. This is visible on the status page (`Version:`), so you can confirm which pods are old versus new while the rollout is in progress. Stage, commit ("Bump version to test rolling update"), push, open a PR into `main`, wait for checks, and merge — then approve production and watch the rolling update proceed: new pods only take traffic once `/readyz` passes.
 
 ## Success criteria
 

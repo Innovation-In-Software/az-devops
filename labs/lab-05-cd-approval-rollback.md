@@ -241,11 +241,41 @@ Finish editing `cd.yml` and save it, then in the **Source Control** panel stage 
 
 > **Why:** An untested rollback is a fire escape welded shut. It is not enough to *have* a rollback path — you have to watch it fire and restore health, or you don't actually know it works. Proving both the happy path (approve, deploy, healthy) and the failure path (bad deploy, auto-rollback, healthy again) is what turns "we have rollback" into "we have rollback that works."
 
-1. That merge in Step 5 already triggered this once — watch CI run, then CD deploy to staging automatically.
-2. Open the **Actions** run; the production job shows **Waiting** for review. Approve it and watch production update.
-3. Now force a bad deploy: create a new branch, open `src/ShipIt/Program.cs`, temporarily change the `/readyz` handler to always return `NOT READY` (and adjust the readiness test in `tests/ShipIt.Tests` to match, so CI still builds the image), then stage/commit/push, open a PR, wait for checks, and merge. This bakes the failure into the image, so rolling back to the previous image actually restores health. (Avoid setting `SHIPIT_READY=false` as a Container App env var for this test: env vars persist across an image rollback, so the app would stay unready even after the rollback.)
-4. Approve the production deploy again and watch the **Roll back on failure** step fire and restore the previous image, then confirm `/readyz` is healthy again.
-5. **Revert the bad `/readyz` code now, before moving on.** The rollback in Step 4 fixed *production* (Container Apps is back on the last good image), but `main`'s actual source code still has the permanently-broken `/readyz` handler — the pipeline will keep building and trying to promote that broken code on every future merge. On a new branch, undo the Step 3 change (restore the real `IsReady()` check and the matching test assertion), commit, push, open a PR, wait for checks, and merge. Confirm the resulting deploy is healthy without a rollback firing this time. Module 6 builds on top of whatever `main` looks like right now, so leaving it broken here breaks that lab too.
+1. That merge in Step 5 already triggered this once. Click the **Actions** tab at the top of your repo. CI runs first; CD only starts once CI finishes on `main` (it's triggered by CI completing, not by the push itself), so give it a few seconds after CI goes green, then a **CD** run appears in the list. Click into it — `deploy-staging` runs and finishes on its own, no click required.
+2. On that same CD run page, `deploy-production` shows a yellow **Waiting** status. Click the **Review deployments** button (top-right of the job list). In the panel that opens, check the box next to **production**, optionally add a comment, then click **Approve and deploy**. Watch `deploy-production` run to completion.
+3. Now force a bad deploy. Create a new branch named `test-bad-deploy`. Open `src/ShipIt/Program.cs` and find this line near the top:
+   ```csharp
+   static bool IsReady() =>
+       !string.Equals(Environment.GetEnvironmentVariable("SHIPIT_READY"), "false", StringComparison.OrdinalIgnoreCase);
+   ```
+   Replace it with:
+   ```csharp
+   static bool IsReady() => false;
+   ```
+   This bakes "always NOT READY" directly into the image, so rolling back to the previous image actually restores health. (Don't instead set `SHIPIT_READY=false` as a Container App env var — env vars persist across an image rollback, so the app would stay unready even after the rollback "succeeds.")
+
+   Now open `tests/ShipIt.Tests/StatusAndHealthTests.cs` and find the `Readyz_is_ready_by_default` test:
+   ```csharp
+   [Fact]
+   public async Task Readyz_is_ready_by_default()
+   {
+       var client = _factory.CreateClient();
+       var response = await client.GetAsync("/readyz");
+       Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+   }
+   ```
+   Change the assertion to match the new behavior, since `/readyz` will now always return 503:
+   ```csharp
+   Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+   ```
+   Without this change CI's test job fails and never builds the image, so there's nothing bad to deploy. Stage both files, commit ("Force /readyz to always fail, to test rollback"), publish the branch, open a PR into `main`, wait for checks, and merge.
+4. Back in the **Actions** tab, open the new CD run and approve `deploy-production` the same way as step 2. Watch the **Roll back on failure** step fire and restore the previous image, then confirm `/readyz` is healthy again.
+5. **Revert the bad `/readyz` code now, before moving on.** Item 4's rollback fixed *production* (Container Apps is back on the last good image), but `main`'s actual source code still has the permanently-broken `/readyz` handler — the pipeline will keep building and trying to promote that broken code on every future merge. Create a new branch named `revert-bad-deploy`. In `src/ShipIt/Program.cs`, put `IsReady()` back to:
+   ```csharp
+   static bool IsReady() =>
+       !string.Equals(Environment.GetEnvironmentVariable("SHIPIT_READY"), "false", StringComparison.OrdinalIgnoreCase);
+   ```
+   In `tests/ShipIt.Tests/StatusAndHealthTests.cs`, put the `Readyz_is_ready_by_default` assertion back to `Assert.Equal(HttpStatusCode.OK, response.StatusCode);`. Commit ("Revert forced /readyz failure"), push, open a PR, wait for checks, and merge. Confirm the resulting deploy is healthy without a rollback firing this time. Module 6 builds on top of whatever `main` looks like right now, so leaving it broken here breaks that lab too.
 
 > **From the slides:** Step 3 bakes the failure *into the image* on purpose. That is the whole reason "build once, promote the same image" makes rollback trustworthy — because the fault travels with the image, redeploying the previous SHA genuinely removes the fault. A config-only failure (like an env var) would survive the rollback, which is exactly why the note steers you away from it.
 

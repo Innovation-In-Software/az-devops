@@ -228,11 +228,32 @@ az monitor metrics alert create -g "$RG" -n shipit-failures \
 
 ## Step 7: Break it, watch the alert, roll back, recover
 
-1. Deploy a deliberately failing version (for example set `SHIPIT_READY=false` or point at a broken build) and drive traffic.
-2. Watch the failure metric climb and the alert fire to your action group.
-3. Roll back using the Lab 5 logic (`helm rollback shipit`, or the pipeline's automatic rollback).
-4. Watch the failure rate return to baseline and the alert resolve.
-5. Map what you saw: the spike is **change failure rate**; the time from alert to recovery is **time to restore (MTTR)**.
+1. Create a branch named `test-failure-alert`. In `src/ShipIt/Program.cs`, find the `app.MapGet("/", () => { ... })` handler and add `return Results.StatusCode(500);` as its very first line, right after the opening `{` — before `var ready = ...`. (The compiler will warn about unreachable code below it; harmless for this test.) This deliberately breaks a real, user-facing endpoint — **not** `/readyz` — so it does *not* gate the rollout the way Lab 5's test did: the pods still pass their readiness probe and take traffic normally, they just serve a 500 to every visitor. That distinction is the point of this step: a passing health check does not mean a healthy application.
+2. In `tests/ShipIt.Tests/StatusAndHealthTests.cs`, update `Status_page_renders_and_names_the_app` to match the new behavior:
+   ```csharp
+   [Fact]
+   public async Task Status_page_renders_and_names_the_app()
+   {
+       var client = _factory.CreateClient();
+       var response = await client.GetAsync("/");
+       Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+   }
+   ```
+   The original test used `GetStringAsync`, which throws on a non-success status before you can assert anything — switch to `GetAsync` and check `response.StatusCode` instead. Without this change CI's test job fails and never builds the image.
+3. Stage both files, commit ("Break / to test the App Insights alert"), push, open a PR, wait for checks, and merge. Because `/readyz` is untouched, `helm upgrade --install --wait` succeeds normally in the pipeline — it has no idea anything is wrong.
+4. Drive traffic at the broken endpoint, the same loop as Step 4:
+   ```bash
+   FQDN=$(kubectl get service shipit -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+   for i in $(seq 1 200); do curl -s "http://$FQDN/" >/dev/null; done
+   ```
+5. In the Azure portal, watch the failure metric climb on your Step 5 dashboard, and confirm the `shipit-failures` alert from Step 6 fires and notifies the action group.
+6. Roll back by hand — the pipeline will not do this for you this time, since nothing about this failure ever showed up as an unhealthy pod:
+   ```bash
+   helm rollback shipit
+   ```
+7. Drive a little more traffic at `/` and confirm the failure rate returns to baseline and the alert resolves.
+8. **Revert the bad code now, before moving on**, the same way Lab 5 Step 6 did. Create a new branch named `revert-failure-alert-test`: remove the `return Results.StatusCode(500);` line, and restore the original `Status_page_renders_and_names_the_app` test (back to `GetStringAsync` and `Assert.Contains("ShipIt", html)`). Commit, push, open a PR, wait for checks, and merge.
+9. Map what you saw: the spike is **change failure rate**; the time from alert to recovery is **time to restore (MTTR)**.
 
 > **Why:** This is the payoff — two DORA metrics stop being definitions and become things you watched happen. The bad deploy that spiked the failure rate *is* change failure rate. The stretch from "alert fired" to "baseline restored" *is* MTTR. You did not read those numbers in a report; you produced them, on purpose, and recovered from them.
 
