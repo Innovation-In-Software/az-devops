@@ -170,6 +170,7 @@ Introduce a flagged issue and watch it block the PR. The starter ships an exampl
 2. Stage, commit, and push (Source Control panel), then open a PR into `main`.
 3. Give CodeQL a couple of minutes. If it flags the issue, the **CodeQL** check goes red and — because it is a required check (Step 4) — the **Merge** button is blocked.
 4. Remediate with the **fixed** version in the same example file, push again, and watch the check clear.
+5. **Merge this PR** — the fixed version (no shell, validated input) is safe to ship, and merging it means Step 7 starts from a clean `main` with no dangling open PR left over from this branch.
 
 > **Reality check on CodeQL coverage.** Whether CodeQL flags a *specific* planted line depends on its current C# models and your configuration. On this minimal-API app, some injection patterns are not traced to a source out of the box (the models are tuned more for controller-based apps), and the workflow form's *default* query suite omits several injection queries entirely — which is why Default setup with the extended suite is recommended. If your example does **not** get flagged, that is not a broken lab: it is a real, valuable lesson — **a scanner's coverage has gaps, so it is one layer of defense in depth, not a guarantee.** The gate that stops a dangerous change is proven by Steps 4–5 regardless; CodeQL is the SAST layer that widens what that gate can catch over time.
 
@@ -177,11 +178,11 @@ Introduce a flagged issue and watch it block the PR. The starter ships an exampl
 
 ## Step 7: Triage one finding
 
-On your repo's GitHub.com page, click **Security** in the top navigation bar (between **Insights** and **Settings**). The left sidebar splits findings by tool: **Dependabot alerts**, **Code scanning alerts**, and **Secret scanning alerts**.
+On your repo's GitHub.com page, click **Security and quality** in the top navigation bar (between **Wiki** and **Insights**). The left sidebar splits findings by tool: **Dependabot alerts**, **Code scanning alerts**, and **Secret scanning alerts**.
 
 > **You will likely see all three empty, and that is not a broken lab — do this step first, before you assume something's wrong.** Each one is empty for a real, specific reason: **Code scanning alerts** is often empty because of the exact CodeQL coverage gap Step 6 already warned you about — the planted example frequently isn't flagged on this app. **Secret scanning alerts** is empty because push protection *worked*: it stopped your token before it ever entered history, so there is nothing left to show — an alert list only shows what got through. **Dependabot alerts** may be empty simply because ShipIt doesn't ship any vulnerable packages right now (confirmed in testing, this can also take a while to populate even once one exists — sometimes well past "a few minutes" — so if you added one, give it time and come back).
 
-**If Dependabot alerts is empty, create a guaranteed real finding** (do this now, then move on to other work and come back once it appears, rather than waiting on this step):
+**If Dependabot alerts is empty, create a guaranteed real finding** (do this now, then move on to other work and come back once it appears, rather than waiting on this step). Create a **new branch** for this — VS Code status bar → branch name → **Create new branch...** → type `test-dependabot-alert` (don't reuse Step 6's branch: that one was for CodeQL, this is a separate, unrelated tool, and Step 6's branch should already be merged and gone):
 
 ```bash
 dotnet add src/ShipIt package Newtonsoft.Json --version 9.0.1
@@ -194,7 +195,7 @@ Once you have an alert, click into it from the **Dependabot alerts** list and pr
 1. **Read the severity.** GitHub shows a CVSS-based rating — **Critical / High / Medium / Low** — plus a link to the GHSA advisory describing exactly what the vulnerability is.
 2. **Judge whether it's actually exploitable in ShipIt — don't stop at the severity number.** For the Newtonsoft.Json example: the advisory describes an insecure-deserialization issue triggered through `TypeNameHandling`. Search your own code (`grep -rn Newtonsoft src/ShipIt`) — you'll find nothing, because ShipIt never actually calls Newtonsoft.Json anywhere; the package sits in the dependency tree unused. That's a **real, high-severity CVE that is not exploitable in this specific app**, because the vulnerable code path is never reached. This is the judgment call the step is teaching: severity describes the dependency in the abstract, exploitability describes whether *your* code can trigger it.
 3. **Dismiss it with a reason, don't just delete the dependency and move on.** On the alert, click **Dismiss alert** and pick a reason from the dropdown — for this example, **"Vulnerable code is not actually used"** is the accurate one (the other options are "This alert is inaccurate or incorrect," "No bandwidth to fix this," "Risk is tolerable to this project," and "A fix has already been started"). Add a one-line comment explaining your reasoning; that comment is what the next person reads instead of re-investigating from scratch.
-4. **Now remove the package for real** (`dotnet add` with no version pins it back to latest, or just delete the `PackageReference` line and run `dotnet restore`) and merge that too — you don't need a genuinely vulnerable dependency sitting in `main` once the exercise is done.
+4. **Now remove the package for real.** On another new branch (`test-dependabot-alert` is merged and gone by now, so create a fresh one — for example `remove-test-dependency`), delete the `PackageReference` line from `src/ShipIt/ShipIt.csproj` and run `dotnet restore`, then commit, push, PR, and merge — you don't need a genuinely vulnerable dependency sitting in `main` once the exercise is done.
 
 Record your decision. This is the habit that keeps the tooling trustworthy.
 
