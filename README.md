@@ -13,4 +13,6 @@ Lab 3: [Containerize ShipIt and Push to ACR](labs/lab-03-containerize-acr.md)
 Lab 4: [Add Security Gates to the ShipIt Pipeline](labs/lab-04-security-gates.md)  
 
 ### Day 2
-Coming soon.
+Lab 5: [Build a CD Pipeline with an Approval Gate and Rollback](labs/lab-05-cd-approval-rollback.md)  
+Lab 6: [Deploy ShipIt to AKS with Helm](labs/lab-06-aks-helm-deploy.md)  
+Lab 7: [Provision Infrastructure with Bicep and Add a Monitoring Alert](labs/lab-07-bicep-monitoring.md)  
