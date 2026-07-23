@@ -70,6 +70,8 @@ export AKS=shipit-aks
 >
 > **From the slides:** This is the "What Helm Gives You" diagram — a chart plus values. You are building the "chart" half now; the "values" half comes in the next steps.
 
+Create a new branch named `add-helm-deploy` now (VS Code status bar → **Create new branch...**) — every file you create in Steps 1-4 belongs on it.
+
 ```bash
 mkdir -p charts                 # helm create needs the parent directory to exist
 helm create charts/shipit
@@ -205,7 +207,7 @@ Reach the status page (get the external address with `kubectl get service shipit
 >
 > **From the slides:** This realizes the "build-once-configure-per-environment" story at pipeline scale — one image, promoted through the gate, reconciled onto the cluster by the same tool you just ran by hand.
 
-Create a new branch named `add-helm-deploy` (VS Code status bar → **Create new branch...**), then open `.github/workflows/cd.yml` in the Explorer. In the `deploy-production` job, **replace the entire job body** — every step below `environment: production` — with the steps below. Keep the `environment: production` gate as the job's own line; everything under it is new.
+You're still on `add-helm-deploy` from Step 1. Open `.github/workflows/cd.yml` in the Explorer. In the `deploy-production` job, **replace the entire job body** — every step below `environment: production` — with the steps below. Keep the `environment: production` gate as the job's own line; everything under it is new.
 
 **Why the whole body, not just "Deploy new image":** Lab 5's `deploy-production` job has four moving parts built for Container Apps: a "Record current image" step, the deploy itself, a hand-written `curl` health-check loop, and a rollback step — and the last three all call `az containerapp show`/`az containerapp update`, which have nothing to do with the AKS cluster you're deploying to now. None of that logic transfers. AKS gets a cleaner design instead, because Helm already does most of the work:
 
