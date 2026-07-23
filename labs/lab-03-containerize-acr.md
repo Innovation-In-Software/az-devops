@@ -44,7 +44,6 @@ A push to `main` results in a `shipit:<sha>` image in your ACR, the image runs l
 - Local tools: Docker Desktop (running), the Azure CLI (`az`), Git, .NET 10 SDK.
 - An ACR instance and an Entra ID app with a federated credential for your repo, plus the `RG`, `ACR`, `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, and `AZURE_SUBSCRIPTION_ID` repository variables — all created by you in Lab 0's `./scripts/lab0-provision.sh` run and set as repository variables there.
 - Commands below run in VS Code's integrated terminal, set to Git Bash (see Lab 0 if you need to switch your terminal profile).
-- Behind? Ask your instructor for the checkpoint branch name and check it out from VS Code's Source Control panel (**...** menu → **Branch → Checkout to...**).
 
 ---
 

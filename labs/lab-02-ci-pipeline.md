@@ -42,7 +42,6 @@ A pull request cannot merge to `main` unless the build and tests pass, artifacts
 - You finished Lab 0 and have the ShipIt starter repository on GitHub, cloned locally.
 - Local tools: Git, the .NET 10 SDK. Verify with `dotnet --version` (should report 10.x).
 - Commands below run in VS Code's integrated terminal, set to Git Bash (see Lab 0 if you need to switch your terminal profile).
-- If you fell behind, ask your instructor for the checkpoint branch name and check it out from VS Code's Source Control panel (**...** menu → **Branch → Checkout to...**).
 
 ---
 

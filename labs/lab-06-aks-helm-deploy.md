@@ -46,7 +46,6 @@ A merge to `main` deploys ShipIt to AKS through the approval gate, the status pa
 - Your own AKS cluster and ACR from Lab 0 — the Lab 0 script attached your registry to your cluster at creation time (`--attach-acr`), so `AcrPull` is already granted; there's no separate attach step to run here.
 - `kubectl` and `helm` installed locally.
 - Commands below run in VS Code's integrated terminal, set to Git Bash (see Lab 0 if you need to switch your terminal profile).
-- Behind? Ask your instructor for the checkpoint branch name and check it out from VS Code's Source Control panel (**...** menu → **Branch → Checkout to...**).
 
 First, set your values — `RG` and `AKS` are fixed names from Lab 0, and `ACR` is the registry name your Lab 0 script printed:
 

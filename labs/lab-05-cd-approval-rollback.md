@@ -46,7 +46,6 @@ Production does not deploy without an approval, a failed health check rolls back
 - You finished Lab 4: ShipIt builds, tests, scans, and pushes a SHA-tagged image to ACR.
 - Your own resource group with two Container Apps targets, `shipit-staging` and `shipit-production` (each with external ingress on the app's port), and your own Entra app registration for the pipeline — all created by `./scripts/lab0-provision.sh` when you ran it yourself in Lab 0.
 - Commands below run in VS Code's integrated terminal, set to Git Bash (see Lab 0 if you need to switch your terminal profile).
-- Behind? Ask your instructor for the checkpoint branch name and check it out from VS Code's Source Control panel (**...** menu → **Branch → Checkout to...**).
 
 Set these once in your shell for the commands below (the same values from your Lab 0 script run):
 

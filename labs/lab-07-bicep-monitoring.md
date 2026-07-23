@@ -49,7 +49,6 @@ The Bicep deploy is idempotent (re-running changes nothing), telemetry flows fro
 - You finished Lab 6: ShipIt runs on AKS via Helm from the pipeline.
 - The pipeline's OIDC login to Azure works (Lab 5), with `Contributor` on the resource group.
 - Commands below run in VS Code's integrated terminal, set to Git Bash (see Lab 0 if you need to switch your terminal profile).
-- Behind? Ask your instructor for the checkpoint branch name and check it out from VS Code's Source Control panel (**...** menu → **Branch → Checkout to...**).
 
 ```bash
 export RG=rg-shipit
