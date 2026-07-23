@@ -46,17 +46,16 @@ A pull request with a blocking security finding cannot merge, push protection st
 - You finished Lab 3: ShipIt containerizes and pushes to ACR.
 - Your ShipIt repository is **public** (from Lab 0). On a personal GitHub account, Dependabot, CodeQL code scanning, and secret scanning are **free on public repositories**; a private personal repo would require GitHub Advanced Security.
 - Commands below run in VS Code's integrated terminal, set to Git Bash (see Lab 0 if you need to switch your terminal profile).
-- Behind? Ask your instructor for the checkpoint branch name and check it out from VS Code's Source Control panel (**...** menu → **Branch → Checkout to...**).
 
 ---
 
 ## Step 1: Turn on the security features
 
-In the repository, go to **Settings → Code security** (or **Advanced Security**) and enable:
+In the repository, go to **Settings → Code security** (or **Advanced Security**) and if these are not already eanbled, enable them:
 
 - **Dependabot alerts** and **Dependabot security updates.**
 - **CodeQL analysis** (choose **Default setup** for the quickest path; it configures the languages for you and, for C#, scans without a separate build step).
-- **Secret scanning** and **Push protection.**
+- **Secret Protection** and **Push protection.**
 
 > **Why:** You are enabling all three at once on purpose. Each tool covers a different attack surface, and a gap in any one is a way in. Turning them on together is the "three risks, three tools" idea made concrete before you wire anything to the gate.
 >
@@ -143,14 +142,15 @@ Now a red security check blocks the merge exactly like a failing test.
 
 Try to commit a real-but-throwaway credential and watch push protection stop you before it lands. **This must be an actual GitHub token, not a made-up string** — GitHub validates the token's built-in checksum, so a hand-typed or random `ghp_...` value is *not* detected and will push right through.
 
-1. Create a throwaway token: on GitHub.com, click your profile picture (top-right) → **Settings**. This opens your personal account settings (not the repo's) — scroll to the bottom of the left sidebar and click **Developer settings**, then **Personal access tokens → Tokens (classic) → Generate new token**. Give it **no scopes** and a short expiry. Copy the `ghp_...` value.
+1. Create a throwaway token: on GitHub.com, click your profile picture (top-right) → **Settings**. This opens your personal account settings (not the repo's) — scroll to the bottom of the left sidebar and click **Developer settings**, then **Personal access tokens → Tokens (classic) → Generate new token (classic)**. Give it **no scopes** and a short expiry. Copy the `ghp_...` value.
 2. In VS Code, create a file `leak.txt` at the repo root containing that value, then stage, commit, and **Sync Changes** from the Source Control panel, same as always.
 
 Push protection rejects the push — VS Code shows this as a notification and in the **Output** panel's **Git** channel, which names the detected secret type (GitHub Personal Access Token). This happens on GitHub's server the instant it receives the push, so it fires the same way no matter which Git client sent it.
 
-3. Remove `leak.txt`, commit and push that removal too, then **delete/revoke the token** in the same settings page — that is the real lesson: a leaked key must be revoked and rotated, not just deleted from the commit, because it may already have been copied.
+3. **Undo the commit — don't just delete the file and commit again.** Pushing a *second* commit that removes `leak.txt` does **not** fix this: push protection scans every commit in the push, and the secret is still sitting in the *first* commit's history even after a later commit removes the file. If you commit the removal and push, you'll hit the exact same rejection. Instead, in the **Source Control** panel, click the **...** (more actions) menu → **Commit → Undo Last Commit**. This un-commits `leak.txt` but leaves the file on disk. Now delete `leak.txt` from the Explorer, stage the deletion, commit again ("Remove accidental secret"), and **Sync Changes** — this time the secret was never part of any commit you're pushing, so it goes through clean.
+4. **Delete/revoke the token** in the same GitHub settings page — that is the real lesson: a leaked key must be revoked and rotated, not just removed from a commit, because it may already have been copied.
 
-> **Why:** This is the third risk — secrets — and the earliest possible catch on the shift-left curve. Push protection detects known token formats and "blocks the commit at push time, before it lands," so the secret never enters history where it could be cloned, cached, or scraped. Notice the ordering in step 3: you revoke the token *and* remove the file. Deleting the commit does not un-leak it — **rotate, don't just delete** — because the moment a real secret hits a push it must be assumed compromised.
+> **Why:** This is the third risk — secrets — and the earliest possible catch on the shift-left curve. Push protection detects known token formats and "blocks the commit at push time, before it lands," so the secret never enters history where it could be cloned, cached, or scraped. Notice why step 3 undoes the commit instead of layering a fix on top: a second commit only changes the *latest* snapshot, not history, and push protection checks history. Notice too the ordering in step 4: you revoke the token *and* remove the file. Deleting the commit does not un-leak it — **rotate, don't just delete** — because the moment a real secret hits a push it must be assumed compromised.
 >
 > **From the slides:** Secret scanning "detects known token formats"; push protection "blocks the commit at push time, before it lands." This is the secrets corner of "Three Risks, Three Tools," and the whole point is that it fires *before* the gate rather than after — the cheapest catch of all.
 
@@ -201,7 +201,8 @@ Record your decision. This is the habit that keeps the tooling trustworthy.
 - **No security features available:** confirm your repository is **public**. On a personal account, code scanning and secret scanning are free on public repos; a private personal repo would need GitHub Advanced Security.
 - **CodeQL check never appears:** confirm Default setup is enabled, or that the `codeql.yml` workflow ran at least once. The check name only becomes selectable in branch protection after a first run.
 - **Push protection did not trigger:** it blocks on recognized token formats and allowlists well-known documentation examples. Use a well-formed GitHub token (`ghp_` plus 36 random characters); avoid the canonical AWS example key, which is allowlisted and also needs its paired secret to be detected.
-- **Dependabot opened no PRs:** your dependencies may already be current. Temporarily pin an older, known-vulnerable package version to see it work (then revert).
+- **Dependabot opened no PRs:** your dependencies may already be current. Temporarily pin an older, known-vulnerable package version to see it work (then revert). Give it more than "a few minutes" before assuming it's broken — real-world alert generation can take longer than that.
+- **Push is still rejected after you deleted `leak.txt` and committed the removal:** the secret is still in an earlier commit's history, and push protection scans the whole push, not just the latest file state. Use **Undo Last Commit** (Source Control panel → **...** → **Commit**) to remove the commit that introduced the secret entirely, rather than adding a commit on top of it.
 
 ## Stretch goals
 
