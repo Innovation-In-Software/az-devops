@@ -89,6 +89,7 @@ done
 The pipeline app also needs permission to update the Container Apps — the Lab 0 script already granted this (`Contributor` on `$RG`) along with each Container App's own registry pull auth. Confirm it's there:
 
 ```bash
+export MSYS_NO_PATHCONV=1   # Windows Git Bash only: stops it mangling the --scope path below (harmless on macOS/Linux)
 SUB=$(az account show --query id -o tsv)
 az role assignment list --assignee "$APP_ID" --scope "/subscriptions/$SUB/resourceGroups/$RG" -o table
 ```
@@ -305,6 +306,7 @@ Finish editing `cd.yml` and save it, then in the **Source Control** panel stage 
 - **`Error: id-token: write` / login can't get a token:** you left out the workflow-level `permissions: id-token: write`.
 - **Health check always fails:** confirm the app's ingress is external and the port matches ShipIt's listening port; test `curl https://$FQDN/readyz` by hand.
 - **CD never triggers:** the `workflow_run` name must match your CI workflow's `name:` exactly, and CI must have run on `main`.
+- **`(MissingSubscription) The request did not have a subscription or a valid tenant level resource provider` from `az role assignment list --scope ...`, even though `az account show` and every variable look correct:** on Windows Git Bash (MSYS2), any argument starting with `/` gets silently rewritten into a Windows-style path before `az` ever sees it — so `--scope "/subscriptions/..."` arrives mangled and empty-looking to Azure, producing this exact, misleading error. Run `export MSYS_NO_PATHCONV=1` in that terminal (harmless on macOS/Linux) and retry.
 
 ## Stretch goals
 
