@@ -100,6 +100,8 @@ config:
   bannerColor: green
 ```
 
+**Replace `<your-acr>` with your actual registry name before saving** — this is a literal placeholder, not something Helm fills in for you. Use the same value you set as `$ACR` above (e.g. `repo: shipitjrsacr.azurecr.io/shipit`). If you leave the placeholder in, `helm upgrade` in Step 3 will try to pull from a registry that doesn't exist and every pod will sit in `ImagePullBackOff`.
+
 Notice what lives in `values.yaml`: the image tag, the replica count, and the per-environment config. These are the knobs you turn without editing a template. The `tag: latest` here is only a default — the pipeline (and your manual deploys) will override it with the exact commit SHA, so every deploy is traceable to a build.
 
 ## Step 2: Template the Deployment, Service, and ConfigMap
