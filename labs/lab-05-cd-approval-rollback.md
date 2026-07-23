@@ -269,7 +269,20 @@ Finish editing `cd.yml` and save it, then in the **Source Control** panel stage 
    Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
    ```
    Without this change CI's test job fails and never builds the image, so there's nothing bad to deploy. Stage both files, commit ("Force /readyz to always fail, to test rollback"), publish the branch, open a PR into `main`, wait for checks, and merge.
-4. Back in the **Actions** tab, open the new CD run and approve `deploy-production` the same way as step 2. Watch the **Roll back on failure** step fire and restore the previous image, then confirm `/readyz` is healthy again.
+4. Back in the **Actions** tab, open the new CD run and approve `deploy-production` the same way as step 2. Watch the **Roll back on failure** step fire and restore the previous image.
+
+   That step finishes with a red X — that is expected, not a bug. Its script ends in `exit 1` on purpose (see the callout under Step 5) so the run is clearly marked failed even though the rollback itself succeeded. Confirm the rollback actually worked:
+
+   **Find your production app's URL, in the Azure portal:**
+   - Go to [portal.azure.com](https://portal.azure.com) and sign in.
+   - In the top search bar, type `shipit-production` and click it in the results (or navigate to your `rg-shipit` resource group and click `shipit-production` in its resource list).
+   - On the **Overview** page, find **Application Url** — a clickable link near the top that looks like `https://shipit-production.<something>.<region>.azurecontainerapps.io`. Copy it (don't click it yet).
+
+   **Curl `/readyz` on that URL:**
+   ```bash
+   curl https://shipit-production.<something>.<region>.azurecontainerapps.io/readyz
+   ```
+   (use the URL you copied from the portal, with `/readyz` added to the end). A response of `READY` confirms the rollback restored the previous, healthy image. If you see `NOT READY`, or the command hangs, the rollback hasn't finished taking effect yet — wait ~15 seconds and retry.
 5. **Revert the bad `/readyz` code now, before moving on.** Item 4's rollback fixed *production* (Container Apps is back on the last good image), but `main`'s actual source code still has the permanently-broken `/readyz` handler — the pipeline will keep building and trying to promote that broken code on every future merge. Create a new branch named `revert-bad-deploy`. In `src/ShipIt/Program.cs`, put `IsReady()` back to:
    ```csharp
    static bool IsReady() =>
