@@ -61,9 +61,12 @@ WORKDIR /src
 COPY src/ShipIt/ShipIt.csproj src/ShipIt/
 RUN dotnet restore src/ShipIt/ShipIt.csproj
 
-# now copy the rest of the source and publish
+# now copy the rest of the source and publish (no --no-restore: publish
+# re-verifies the restore state cheaply when the cache above is warm, and
+# without it a real package dependency can fail here with NETSDK1064 on some
+# CI runners even though the restore step above reported success)
 COPY . .
-RUN dotnet publish src/ShipIt -c Release -o /app --no-restore
+RUN dotnet publish src/ShipIt -c Release -o /app
 
 # runtime stage: small image, only the published app
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
@@ -209,6 +212,7 @@ Read the findings in the run log. Leave `exit-code: "0"` for now so the scan rep
 - **Slow builds every time:** you copied all source before restoring. Put the `.csproj` copy and `dotnet restore` before `COPY . .`. (This is the layer-cache rule from Step 1 — a change above the restore layer invalidates it.)
 - **Container exits immediately:** check the `ENTRYPOINT` DLL name matches your published assembly (`ShipIt.dll`).
 - **`docker compose up` fails with a port-in-use / address already allocated error:** the Step 2 container is still running and holding port 8080. Go to that terminal and press `Ctrl+C` to stop it (or run `docker ps` to find it and `docker stop <container-id>`), then retry.
+- **`dotnet publish` fails in the pipeline with `NETSDK1064: Package ... was not found`, but the restore step above it reported success:** this happens on some CI runners once the project has real NuGet dependencies (Module 7 adds the first one). The fix is already in the Dockerfile above — `dotnet publish` runs *without* `--no-restore`, so it can silently re-verify/repair the restore state instead of trusting a possibly-stale one. If you changed this back to speed up builds, put it back.
 
 ## Stretch goals
 
@@ -233,7 +237,7 @@ WORKDIR /src
 COPY src/ShipIt/ShipIt.csproj src/ShipIt/
 RUN dotnet restore src/ShipIt/ShipIt.csproj
 COPY . .
-RUN dotnet publish src/ShipIt -c Release -o /app --no-restore
+RUN dotnet publish src/ShipIt -c Release -o /app
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
