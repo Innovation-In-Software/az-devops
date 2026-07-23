@@ -103,7 +103,7 @@ On GitHub.com, go to your repo's **Settings → Environments**, click **New envi
 
 - On the **production** configuration page, check **Required reviewers**, add yourself in the box that appears, then click **Save protection rules**. This is the human gate. (Required reviewers work on **public** repositories for personal GitHub accounts, which is why your ShipIt repo is public.)
 - You do **not** need to add any variables to the environments. `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `RG`, `ACR`, and `AKS` are all **repository** variables (set in Lab 0), so every job — including the no-environment CI job — can read them.
-- Optionally, on the same **production** page, set **Deployment branches and tags** to **Selected branches** and add `main`, so only `main` can deploy to it.
+- Optionally, on the same **production** page, set **Deployment branches and tags** to **Selected branches and tags** and add `main`, so only `main` can deploy to it.
 
 > **From the slides:** This is the human-belongs-here decision, made once, in a setting. The required reviewer is exactly the "a human clicks go for production" line that separates continuous *delivery* from continuous *deployment*.
 
