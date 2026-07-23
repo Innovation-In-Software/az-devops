@@ -55,6 +55,11 @@ export ACR=<your-registry-name>   # from your Lab 0 script run, e.g. shipitjrsac
 export AKS=shipit-aks
 ```
 
+> **Lost the `ACR` value from Lab 0?** `RG` (`rg-shipit`) and `AKS` (`shipit-aks`) are fixed names, so there's nothing to look up for those — but your registry name is unique to you. Recover it one of these ways:
+> - **Fastest:** on GitHub.com, go to your repo's **Settings → Secrets and variables → Actions → Variables** tab. The Lab 0 script already set `ACR` there as a repository variable (along with `RG`, `AKS`, and the three `AZURE_*` values) — read the value directly off that page.
+> - **Azure CLI:** `az acr list -g rg-shipit --query "[].name" -o tsv` prints your registry's name (there's only one in your resource group).
+> - **Azure portal:** go to [portal.azure.com](https://portal.azure.com), open your `rg-shipit` resource group, and find the resource with type **Container registry** in the list — its name is shown right there, and again at the top of its **Overview** page if you click into it.
+
 Then point `kubectl` at your cluster (this pulls the cluster's credentials into your kubeconfig):
 
 ```bash
