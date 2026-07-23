@@ -179,10 +179,11 @@ A green check does nothing until a red one can stop a merge. On GitHub.com, go t
 - **Require a pull request before merging.** Checking this reveals a sub-option, **Require approvals**, switched on with a default of **1** — **uncheck it, or set the number to 0.** You're working solo right now, and GitHub will not let you approve your own pull request, so leaving this on locks you out of merging anything.
 - **Require status checks to pass before merging**, and search for/select the `build-and-test` check (it only appears in this list after the workflow has run at least once — see Troubleshooting below if you don't see it).
 - **Require branches to be up to date before merging.**
+- **Do not allow bypassing the above settings** (near the bottom of the page). **This one matters more than it looks.** You are the owner of your own fork, and GitHub treats repo owners as admins — without this box checked, *you specifically* can still push straight to `main` and skip every rule above, no error, just a quiet "bypassed rule violations" note in the push output. This box is what actually makes the rule apply to you too, not just to hypothetical other collaborators.
 
 Scroll down and click **Create** (or **Save changes**).
 
-> **This is the fix for the Friday-hero anti-pattern.** Nobody, including you, can now push straight to `main`, and nothing merges with a red check.
+> **This is the fix for the Friday-hero anti-pattern.** Nobody, including you, can now push straight to `main`, and nothing merges with a red check — but only because you checked **"Do not allow bypassing the above settings."** Skip that box and the rule is real for everyone except you, which quietly defeats the whole lesson.
 
 > **Why:** This is the step where CI "changes from a suggestion into a rule." Up to now the green check has been advisory — helpful, but skippable. **Branch protection is what gives CI teeth.** As the slides put it, "a green check that cannot block a bad merge is just decoration." Requiring the status check makes the machine's verdict binding; requiring "up to date before merging" makes sure a change is tested against the latest `main`, not a stale copy that passed in isolation.
 >
@@ -222,6 +223,7 @@ You are done when all of these are true:
 - **Cache never hits:** confirm the `key` is identical between runs and that `*.csproj` files did not change.
 - **Cannot select the status check in branch protection:** the check name only appears after the workflow has run at least once. Run it, then add the rule.
 - **"Review required" / you can't approve your own pull request:** first check the PR itself — GitHub defaults the base repository to the original `jruels/shipit` template when you open a PR from a fork, not your own fork (see the note in Step 2 above). If the PR's base says `jruels/shipit` instead of your own `<you>/shipit`, that's the problem: close this PR (you can't edit its base repository after the fact) and open a new one with **both** sides pointed at your own fork. If the base is correctly your own repo and you still see this, then it's your branch protection rule: go to **Settings → Branches**, edit the rule for `main`, uncheck **Require approvals** (or set it to 0), and save.
+- **A direct push to `main` seemed to work even though you didn't go through a PR:** check whether you left **"Do not allow bypassing the above settings"** unchecked in Step 5. Without it, the rule doesn't apply to you as the repo owner — the push succeeds with a "bypassed rule violations" note instead of being rejected. Go back to **Settings → Branches**, edit the rule, and check that box.
 
 ## Stretch goals
 
