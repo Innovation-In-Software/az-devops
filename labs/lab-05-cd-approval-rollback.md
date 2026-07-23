@@ -53,7 +53,7 @@ Set these once in your shell for the commands below (the same values from your L
 export RG=rg-shipit
 export ACR=<your-registry-name>           # your registry name from Lab 0, without .azurecr.io
 export APP_ID=<pipeline-entra-app-client-id>   # AZURE_CLIENT_ID from Lab 0
-export GH_USER=<your-github-username>     # your personal GitHub account
+GH_USER=$(gh api user --jq .login)         # derived automatically, same as the Lab 0 script
 ```
 
 ---

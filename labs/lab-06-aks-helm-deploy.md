@@ -318,4 +318,4 @@ Make a small code change on a new branch, PR it into `main`, merge, then approve
 
 ## What this sets up
 
-ShipIt now runs on a real cluster from the pipeline, but you created that cluster and its registry by clicking through the Azure portal. In **Module 7** you define that infrastructure as code with Bicep, deploy it through the same gated pipeline, then instrument ShipIt with Application Insights and build the dashboard and alert that finally let you measure the DORA metrics you set as targets in Lab 1.
+ShipIt now runs on a real cluster from the pipeline, but you created that cluster and its registry by running individual `az` CLI commands in Lab 0 — imperative and unreviewed, even though it was scripted rather than clicked. In **Module 7** you define that infrastructure as code with Bicep, deploy it through the same gated pipeline, then instrument ShipIt with Application Insights and build the dashboard and alert that finally let you measure the DORA metrics you set as targets in Lab 1.
