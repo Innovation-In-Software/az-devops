@@ -93,7 +93,7 @@ You are about to create, in **your own Azure subscription only**: a resource gro
 With the `shipit` folder open in VS Code (from Step 2), open a terminal rooted there: **Terminal → New Terminal** (make sure it's a **Git Bash** terminal — check the prompt as in Step 1). Run:
 
 ```bash
-export MSYS_NO_PATHCONV
+export MSYS_NO_PATHCONV=1
 ./scripts/lab0-provision.sh <your-initials>
 ```
 
